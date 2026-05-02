@@ -142,6 +142,9 @@ h1 {
 
 #flours-content {
   padding: 0 0.875rem 0.875rem;
+}
+
+#flours-content:not([hidden]) {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -182,7 +185,7 @@ h1 {
 /* Unit cards */
 .converter {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 0.5rem;
 }
 
@@ -223,6 +226,22 @@ h1 {
 
 .input-wrapper {
   position: relative;
+}
+
+.input-wrapper[data-unit]::after {
+  content: attr(data-unit);
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.input-wrapper[data-unit] input[type="number"],
+.input-wrapper[data-unit] .result {
+  padding-right: 1.8rem;
 }
 
 input[type="number"] {

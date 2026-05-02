@@ -14,7 +14,7 @@ function round(n, decimals = 6) {
 }
 
 function formatDisplay(n) {
-  return Math.round(n).toString();
+  return Math.round(n).toLocaleString('en-US');
 }
 
 function formatSalt(n) {
@@ -52,7 +52,7 @@ function handleInput() {
   document.getElementById('salt_result_g').innerHTML = formatSalt(new_salt_g);
   document.getElementById('reserve_water_result_g').innerHTML = formatDisplay(round(reserve_water_g));
 
-
+  renderFlours();
 }
 
 // Wire up inputs
@@ -89,6 +89,11 @@ function buildShareUrl() {
   p.set('f',  inputs.total_flour_g.value);
   p.set('rw', inputs.reserve_water_pct.value);
   p.set('a',  autolyseCheckbox.checked ? '1' : '0');
+  if (flourInputValues.length > 0) {
+    p.set('fl', flourInputValues.join(','));
+  } else {
+    p.delete('fl');
+  }
   return url.toString();
 }
 
@@ -134,6 +139,7 @@ function currentSettings() {
     total_flour_g:      inputs.total_flour_g.value,
     reserve_water_pct:  inputs.reserve_water_pct.value,
     autolyse:           autolyseCheckbox.checked,
+    flours:             JSON.stringify(flourInputValues),
   };
 }
 
@@ -174,6 +180,14 @@ function renderSaves() {
       inputs.salt_pct.value            = s.salt_pct;
       inputs.total_flour_g.value       = s.total_flour_g;
       inputs.reserve_water_pct.value   = s.reserve_water_pct;
+      flourInputValues = JSON.parse(s.flours || '[]');
+      if (flourInputValues.length > 0) {
+        floursToggle.setAttribute('aria-expanded', 'true');
+        floursContent.hidden = false;
+      } else {
+        floursToggle.setAttribute('aria-expanded', 'false');
+        floursContent.hidden = true;
+      }
       setAutolyse(s.autolyse);
       handleInput();
     });
@@ -184,8 +198,11 @@ function renderSaves() {
 }
 
 const saveLabelInput = document.getElementById('save-label-input');
+saveLabelInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('save-btn').click();
+});
 
-const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_hydration_pct', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse'];
+const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_hydration_pct', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse', 'flours'];
 
 function settingsEqual(a, b) {
   return SETTINGS_KEYS.every(k => String(a[k]) === String(b[k]));
@@ -245,6 +262,17 @@ window.onload = function() {
   if (p.has('f'))  inputs.total_flour_g.value       = p.get('f');
   if (p.has('rw')) inputs.reserve_water_pct.value   = p.get('rw');
   if (p.has('a'))  setAutolyse(p.get('a') === '1');
+  if (p.has('fl')) {
+    flourInputValues = p.get('fl').split(',').filter(Boolean);
+    if (flourInputValues.length > 0) {
+      floursToggle.setAttribute('aria-expanded', 'true');
+      floursContent.hidden = false;
+    }
+    else {
+      floursToggle.setAttribute('aria-expanded', 'false');
+      floursContent.hidden = true;
+    }
+  }
   handleInput();
   renderSaves();
   renderFlours();
@@ -265,24 +293,35 @@ function flour1Value() {
 }
 
 function updateFlour1() {
+  const val = flour1Value();
+  const totalFlour = parseFloat(inputs.total_flour_g.value) || 0;
+  const levain_pct = parseFloat(inputs.levain_pct.value) || 0;
+  const levain_flour_g = levain_pct * totalFlour / 100;
+
   const span = document.getElementById('flour-1-value');
-  if (span) span.textContent = flour1Value();
+  const grams = document.getElementById('flour-1-grams');
+  if (span) span.textContent = val;
+  if (grams) grams.textContent = Math.round(val / 100 * totalFlour - levain_flour_g).toLocaleString('en-US');
 }
 
 function renderFlours() {
   floursGrid.innerHTML = '';
 
+  const totalFlour = parseFloat(inputs.total_flour_g.value) || 0;
+  const f1 = flour1Value();
   const card1 = document.createElement('div');
   card1.className = 'unit-card';
   card1.innerHTML = `
     <div class="unit-header"><span class="unit-name">Flour 1</span></div>
-    <div class="input-wrapper"><span class="result" id="flour-1-value">${flour1Value()}</span></div>
+    <div class="input-wrapper" data-unit="%"><span class="result" id="flour-1-value">${f1}</span></div>
+    <div class="input-wrapper" data-unit="g"><span class="result flour-grams" id="flour-1-grams">${Math.round(f1 / 100 * totalFlour).toLocaleString('en-US')}</span></div>
   `;
   floursGrid.append(card1);
 
   flourInputValues.forEach((val, i) => {
     const card = document.createElement('div');
     card.className = 'unit-card';
+    const pct = parseFloat(val) || 0;
     const header = document.createElement('div');
     header.className = 'unit-header';
     header.innerHTML = `<span class="unit-name">Flour ${i + 2}</span>`;
@@ -292,18 +331,28 @@ function renderFlours() {
     input.step = 'any';
     input.autocomplete = 'off';
     input.value = val;
+    const gramsSpan = document.createElement('span');
+    gramsSpan.className = 'result flour-grams';
+    gramsSpan.textContent = Math.round(pct / 100 * totalFlour).toLocaleString('en-US');
     input.addEventListener('input', () => {
       flourInputValues[i] = input.value;
+      gramsSpan.textContent = Math.round((parseFloat(input.value) || 0) / 100 * totalFlour).toLocaleString('en-US');
       updateFlour1();
     });
-    const wrapper = document.createElement('div');
-    wrapper.className = 'input-wrapper';
-    wrapper.append(input);
-    card.append(header, wrapper);
+    const inputWrapper = document.createElement('div');
+    inputWrapper.className = 'input-wrapper';
+    inputWrapper.dataset.unit = '%';
+    inputWrapper.append(input);
+    const gramsWrapper = document.createElement('div');
+    gramsWrapper.className = 'input-wrapper';
+    gramsWrapper.dataset.unit = 'g';
+    gramsWrapper.append(gramsSpan);
+    card.append(header, inputWrapper, gramsWrapper);
     floursGrid.append(card);
   });
 
   flourRemove.disabled = flourInputValues.length === 0;
+  updateFlour1();
 }
 
 floursToggle.addEventListener('click', () => {
