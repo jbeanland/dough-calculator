@@ -101,11 +101,82 @@ h1 {
 
 /* Section panels */
 #inputs-grid,
-#results {
+#results,
+#flours-section {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+}
+
+#inputs-grid,
+#results {
   padding: 0.875rem;
+}
+
+.flours-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition);
+}
+
+.flours-header:hover {
+  color: var(--text);
+}
+
+.flours-chevron {
+  flex-shrink: 0;
+  transition: transform var(--transition);
+}
+
+.flours-header[aria-expanded="true"] .flours-chevron {
+  transform: rotate(180deg);
+}
+
+#flours-content {
+  padding: 0 0.875rem 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flours-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.flour-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.flour-btn:hover:not(:disabled) {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.flour-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 /* Unit cards */

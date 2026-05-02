@@ -247,4 +247,79 @@ window.onload = function() {
   if (p.has('a'))  setAutolyse(p.get('a') === '1');
   handleInput();
   renderSaves();
+  renderFlours();
 };
+
+// Different Flours
+const floursToggle = document.getElementById('flours-toggle');
+const floursContent = document.getElementById('flours-content');
+const floursGrid = document.getElementById('flours-grid');
+const flourAdd = document.getElementById('flour-add');
+const flourRemove = document.getElementById('flour-remove');
+
+let flourInputValues = []; // values for Flour 2, 3, ... (Flour 1 is computed)
+
+function flour1Value() {
+  const sum = flourInputValues.reduce((acc, v) => acc + (parseFloat(v) || 0), 0);
+  return parseFloat((100 - sum).toFixed(2));
+}
+
+function updateFlour1() {
+  const span = document.getElementById('flour-1-value');
+  if (span) span.textContent = flour1Value();
+}
+
+function renderFlours() {
+  floursGrid.innerHTML = '';
+
+  const card1 = document.createElement('div');
+  card1.className = 'unit-card';
+  card1.innerHTML = `
+    <div class="unit-header"><span class="unit-name">Flour 1</span></div>
+    <div class="input-wrapper"><span class="result" id="flour-1-value">${flour1Value()}</span></div>
+  `;
+  floursGrid.append(card1);
+
+  flourInputValues.forEach((val, i) => {
+    const card = document.createElement('div');
+    card.className = 'unit-card';
+    const header = document.createElement('div');
+    header.className = 'unit-header';
+    header.innerHTML = `<span class="unit-name">Flour ${i + 2}</span>`;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.placeholder = '0';
+    input.step = 'any';
+    input.autocomplete = 'off';
+    input.value = val;
+    input.addEventListener('input', () => {
+      flourInputValues[i] = input.value;
+      updateFlour1();
+    });
+    const wrapper = document.createElement('div');
+    wrapper.className = 'input-wrapper';
+    wrapper.append(input);
+    card.append(header, wrapper);
+    floursGrid.append(card);
+  });
+
+  flourRemove.disabled = flourInputValues.length === 0;
+}
+
+floursToggle.addEventListener('click', () => {
+  const expanded = floursToggle.getAttribute('aria-expanded') === 'true';
+  floursToggle.setAttribute('aria-expanded', String(!expanded));
+  floursContent.hidden = expanded;
+});
+
+flourAdd.addEventListener('click', () => {
+  flourInputValues.push('');
+  renderFlours();
+});
+
+flourRemove.addEventListener('click', () => {
+  if (flourInputValues.length > 0) {
+    flourInputValues.pop();
+    renderFlours();
+  }
+});
