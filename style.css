@@ -267,7 +267,6 @@ input[type="number"].invalid {
 
 .saves-heading {
   font-size: 0.7rem;
-  text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--text-muted);
   margin-bottom: 0.5rem;
@@ -419,6 +418,13 @@ input[type="number"].invalid {
   display: flex;
 }
 
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
 .phase-group {
   padding-top: 0.75rem;
 }
@@ -431,7 +437,6 @@ input[type="number"].invalid {
 .phase-label {
   display: none;
   font-size: 0.7rem;
-  text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--text-muted);
   margin-bottom: 0.4rem;
