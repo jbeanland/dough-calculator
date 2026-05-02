@@ -14,9 +14,11 @@ function round(n, decimals = 6) {
 }
 
 function formatDisplay(n) {
-  // Show up to 4 significant decimal places without trailing zeros
-  const s = parseFloat(n.toFixed(4)).toString();
-  return s;
+  return Math.round(n).toString();
+}
+
+function formatSalt(n) {
+  return n.toFixed(2);
 }
 
 function handleInput() {
@@ -47,7 +49,7 @@ function handleInput() {
   document.getElementById('water_result_g').innerHTML = formatDisplay(round(new_water_g - reserve_water_g));
   document.getElementById('flour_result_g').innerHTML = formatDisplay(round(new_flour_g));
   document.getElementById('levain_result_g').innerHTML = formatDisplay(round(total_levain_g));
-  document.getElementById('salt_result_g').innerHTML = formatDisplay(round(new_salt_g));
+  document.getElementById('salt_result_g').innerHTML = formatSalt(new_salt_g);
   document.getElementById('reserve_water_result_g').innerHTML = formatDisplay(round(reserve_water_g));
 
 

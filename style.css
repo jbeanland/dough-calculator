@@ -147,7 +147,6 @@ h1 {
 .unit-name {
   font-size: 0.8rem;
   color: var(--text-muted);
-  text-transform: uppercase;
   letter-spacing: 1px;
 }
 
@@ -413,13 +412,11 @@ input[type="number"].invalid {
 }
 
 .autolyse-input-only {
-  visibility: hidden;
-  pointer-events: none;
+  display: none;
 }
 
 #inputs-grid.autolyse .autolyse-input-only {
-  visibility: visible;
-  pointer-events: auto;
+  display: flex;
 }
 
 .phase-group {
@@ -468,5 +465,21 @@ input[type="number"].invalid {
 @media (max-width: 480px) {
   .converter {
     grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .toolbar-right {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .save-label-input {
+    flex: 1;
+    min-width: 0;
+    width: auto;
   }
 }
