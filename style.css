@@ -5,7 +5,7 @@
 }
 
 :root {
-  --bg: #0f1117;
+  --bg: #21242e;
   --surface: #1a1d27;
   --surface-2: #22263a;
   --border: #2e3350;
@@ -16,6 +16,17 @@
   --radius: 16px;
   --radius-sm: 10px;
   --transition: 180ms ease;
+}
+
+[data-theme="light"] {
+  --bg: #f4f5f9;
+  --surface: #ffffff;
+  --surface-2: #eef0f7;
+  --border: #d0d4e8;
+  --accent: #4a6ef5;
+  --accent-glow: #4a6ef522;
+  --text: #1a1d2e;
+  --text-muted: #7279a0;
 }
 
 body {
@@ -46,6 +57,30 @@ main {
 /* Header */
 header {
   text-align: center;
+  position: relative;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.theme-toggle:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
 }
 
 h1 {
@@ -389,7 +424,6 @@ input[type="number"].invalid {
 
 .phase-group {
   padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
 }
 
 .phase-group:first-child {
