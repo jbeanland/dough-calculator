@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dough Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Dough Calculator</h1>
+      <p class="subtitle">Get dem ratios</p>
+    </header>
+
+    <main>
+      <label class="autolyse-toggle">
+        <input type="checkbox" id="autolyse" />
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        Autolyse
+      </label>
+
+      <div class="converter" id="inputs-grid">
+        <div class="unit-card">
+          <div class="unit-header">
+            <span class="unit-name">Hydration (%)</span>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="hydration_pct"
+              value="75"
+              step="any"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-header">
+            <span class="unit-name">Levain (%)</span>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="levain_pct"
+              value="10"
+              step="any"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-header">
+            <span class="unit-name">Levain Hydration (%)</span>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="levain_hydration_pct"
+              value="100"
+              step="any"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-header">
+            <span class="unit-name">Salt (%)</span>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="salt_pct"
+              value="2.5"
+              step="any"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-header">
+            <span class="unit-name">Total Flour (g)</span>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="total_flour_g"
+              value="500"
+              step="any"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <div class="unit-card autolyse-input-only">
+          <div class="unit-header">
+            <span class="unit-name">Reserve Water (%)</span>
+          </div>
+          <div class="input-wrapper">
+            <input
+              type="number"
+              id="reserve_water_pct"
+              value="5"
+              step="any"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div id="results">
+        <div class="phase-group">
+          <p class="phase-label first-phase-label"></p>
+          <div class="converter">
+            <div class="unit-card">
+              <div class="unit-header">
+                <span class="unit-name">Total Weight (g)</span>
+              </div>
+              <div class="input-wrapper">
+                <span id="weight_result_g" class="result">0</span>
+              </div>
+            </div>
+
+            <div class="unit-card">
+              <div class="unit-header">
+                <span class="unit-name">Flour (g)</span>
+              </div>
+              <div class="input-wrapper">
+                <span id="flour_result_g" class="result">0</span>
+              </div>
+            </div>
+
+            <div class="unit-card">
+              <div class="unit-header">
+                <span class="unit-name">Water (g)</span>
+              </div>
+              <div class="input-wrapper">
+                <span id="water_result_g" class="result">0</span>
+              </div>
+            </div>
+
+            <div class="unit-card">
+              <div class="unit-header">
+                <span class="unit-name">Levain (g)</span>
+              </div>
+              <div class="input-wrapper">
+                <span id="levain_result_g" class="result">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="phase-group" id="phase-after">
+          <p class="phase-label">After Autolyse</p>
+          <div class="converter">
+            <div class="unit-card">
+              <div class="unit-header">
+                <span class="unit-name">Salt (g)</span>
+              </div>
+              <div class="input-wrapper">
+                <span id="salt_result_g" class="result">0</span>
+              </div>
+            </div>
+
+            <div class="unit-card autolyse-only">
+              <div class="unit-header">
+                <span class="unit-name">Reserve Water (g)</span>
+              </div>
+              <div class="input-wrapper">
+                <span id="reserve_water_result_g" class="result">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

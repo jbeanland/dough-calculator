@@ -1,0 +1,282 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface-2: #22263a;
+  --border: #2e3350;
+  --accent: #6c8fff;
+  --accent-glow: #6c8fff33;
+  --text: #e8eaf6;
+  --text-muted: #6b7299;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 180ms ease;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100dvh;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: 2rem 1rem;
+}
+
+.app {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Header */
+header {
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
+}
+
+/* Section panels */
+#inputs-grid,
+#results {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.875rem;
+}
+
+/* Unit cards */
+.converter {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.unit-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.unit-card:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.unit-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.unit-symbol {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.unit-name {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+input[type="number"] {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  outline: none;
+  transition: border-color var(--transition);
+  /* hide spinner arrows */
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+input[type="number"].invalid {
+  border-color: var(--hot);
+  color: var(--hot);
+}
+
+.unit-info {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Autolyse toggle */
+.autolyse-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  user-select: none;
+  width: fit-content;
+}
+
+.autolyse-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-track {
+  width: 36px;
+  height: 20px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  transition: transform var(--transition), background var(--transition);
+}
+
+.autolyse-toggle input:checked ~ .toggle-track {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+.autolyse-toggle input:checked ~ .toggle-track .toggle-thumb {
+  transform: translateX(16px);
+  background: var(--accent);
+}
+
+/* Results phases */
+#results {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.autolyse-only {
+  display: none;
+}
+
+#results.autolyse .autolyse-only {
+  display: flex;
+}
+
+.autolyse-input-only {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#inputs-grid.autolyse .autolyse-input-only {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.phase-group {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.phase-group:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.phase-label {
+  display: none;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.first-phase-label {
+  display: block;
+}
+
+.first-phase-label::before {
+  content: "Ingredients";
+}
+
+#results.autolyse .first-phase-label::before {
+  content: "Before Autolyse";
+}
+
+#results.autolyse .phase-label {
+  display: block;
+}
+
+
+.result {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  color: var(--accent);
+}
+
+@media (max-width: 480px) {
+  .converter {
+    grid-template-columns: 1fr;
+  }
+}
