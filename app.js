@@ -111,6 +111,111 @@ shareBtn.addEventListener('click', () => {
   }
 });
 
+// Saves
+const STORAGE_KEY = 'dough_saves';
+
+function getSaves() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+
+function putSaves(saves) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saves));
+}
+
+function currentSettings() {
+  return {
+    hydration_pct:      inputs.hydration_pct.value,
+    levain_pct:         inputs.levain_pct.value,
+    levain_hydration_pct: inputs.levain_hydration_pct.value,
+    salt_pct:           inputs.salt_pct.value,
+    total_flour_g:      inputs.total_flour_g.value,
+    reserve_water_pct:  inputs.reserve_water_pct.value,
+    autolyse:           autolyseCheckbox.checked,
+  };
+}
+
+
+function renderSaves() {
+  const saves = getSaves();
+  const section = document.getElementById('saves-section');
+  const list = document.getElementById('saves-list');
+  section.hidden = saves.length === 0;
+  list.innerHTML = '';
+  for (const save of saves) {
+    const row = document.createElement('div');
+    row.className = 'save-row';
+
+    const label = document.createElement('span');
+    label.className = 'save-label';
+    label.textContent = save.label;
+
+    const time = document.createElement('span');
+    time.className = 'save-time';
+    time.textContent = new Date(save.id).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    const del = document.createElement('button');
+    del.className = 'save-delete';
+    del.textContent = '×';
+    del.setAttribute('aria-label', 'Delete save');
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();
+      putSaves(getSaves().filter(s => s.id !== save.id));
+      renderSaves();
+    });
+
+    row.addEventListener('click', () => {
+      const s = save.settings;
+      inputs.hydration_pct.value       = s.hydration_pct;
+      inputs.levain_pct.value          = s.levain_pct;
+      inputs.levain_hydration_pct.value = s.levain_hydration_pct;
+      inputs.salt_pct.value            = s.salt_pct;
+      inputs.total_flour_g.value       = s.total_flour_g;
+      inputs.reserve_water_pct.value   = s.reserve_water_pct;
+      setAutolyse(s.autolyse);
+      handleInput();
+    });
+
+    row.append(label, time, del);
+    list.append(row);
+  }
+}
+
+const saveLabelInput = document.getElementById('save-label-input');
+
+const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_hydration_pct', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse'];
+
+function settingsEqual(a, b) {
+  return SETTINGS_KEYS.every(k => String(a[k]) === String(b[k]));
+}
+
+document.getElementById('save-btn').addEventListener('click', () => {
+  const label = saveLabelInput.value.trim();
+  if (!label) {
+    saveLabelInput.focus();
+    return;
+  }
+  const saves = getSaves();
+  const current = currentSettings();
+
+  const dupeName = saves.find(s => s.label.toLowerCase() === label.toLowerCase());
+  if (dupeName) {
+    showToast(`"${dupeName.label}" already exists.`, true);
+    return;
+  }
+
+  const dupeSettings = saves.find(s => settingsEqual(s.settings, current));
+  if (dupeSettings) {
+    showToast(`These settings already exist as "${dupeSettings.label}".`, true);
+    return;
+  }
+
+  saves.unshift({ id: Date.now(), label, settings: current });
+  putSaves(saves);
+  renderSaves();
+  saveLabelInput.value = '';
+});
+
 // Restore from URL params on load
 window.onload = function() {
   const p = new URLSearchParams(location.search);
@@ -122,4 +227,5 @@ window.onload = function() {
   if (p.has('rw')) inputs.reserve_water_pct.value   = p.get('rw');
   if (p.has('a'))  setAutolyse(p.get('a') === '1');
   handleInput();
+  renderSaves();
 };

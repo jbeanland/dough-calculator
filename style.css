@@ -162,6 +162,12 @@ input[type="number"].invalid {
   justify-content: space-between;
 }
 
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .share-btn {
   display: flex;
   align-items: center;
@@ -179,6 +185,103 @@ input[type="number"].invalid {
 .share-btn:hover {
   background: #6c8fff22;
   box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.save-label-input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.8rem;
+  padding: 0.35rem 0.6rem;
+  outline: none;
+  width: 160px;
+  transition: border-color var(--transition);
+}
+
+.save-label-input:focus {
+  border-color: var(--accent);
+}
+
+.save-label-input::placeholder {
+  color: var(--text-muted);
+}
+
+.save-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.save-btn:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+/* Saves section */
+#saves-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.875rem;
+}
+
+.saves-heading {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.save-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.save-row:hover .save-label {
+  color: var(--accent);
+}
+
+.save-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.save-label {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.save-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.save-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.save-delete:hover {
+  color: var(--hot);
 }
 
 .share-toast {
