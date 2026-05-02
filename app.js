@@ -59,13 +59,67 @@ for (const [name, input] of Object.entries(inputs)) {
 }
 
 const autolyseCheckbox = document.getElementById('autolyse');
-autolyseCheckbox.addEventListener('change', () => {
-  const active = autolyseCheckbox.checked;
+
+function setAutolyse(active) {
+  autolyseCheckbox.checked = active;
   document.getElementById('results').classList.toggle('autolyse', active);
   document.getElementById('inputs-grid').classList.toggle('autolyse', active);
+}
+
+autolyseCheckbox.addEventListener('change', () => {
+  setAutolyse(autolyseCheckbox.checked);
   handleInput();
 });
 
+// Share
+const shareBtn = document.getElementById('share-btn');
+const shareLabel = document.getElementById('share-label');
+const shareToast = document.getElementById('share-toast');
+let toastTimer = null;
+
+function buildShareUrl() {
+  const url = new URL(location.href);
+  const p = url.searchParams;
+  p.set('h',  inputs.hydration_pct.value);
+  p.set('l',  inputs.levain_pct.value);
+  p.set('lh', inputs.levain_hydration_pct.value);
+  p.set('s',  inputs.salt_pct.value);
+  p.set('f',  inputs.total_flour_g.value);
+  p.set('rw', inputs.reserve_water_pct.value);
+  p.set('a',  autolyseCheckbox.checked ? '1' : '0');
+  return url.toString();
+}
+
+function showToast(msg, error = false) {
+  shareToast.textContent = msg;
+  shareToast.className = 'share-toast visible' + (error ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { shareToast.className = 'share-toast'; }, 2500);
+}
+
+shareBtn.addEventListener('click', () => {
+  const url = buildShareUrl();
+  history.replaceState(null, '', url);
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      shareLabel.textContent = 'Copied!';
+      showToast('Link copied to clipboard.');
+      setTimeout(() => { shareLabel.textContent = 'Share'; }, 2000);
+    }).catch(() => showToast('URL updated in address bar.'));
+  } else {
+    showToast('URL updated in address bar.');
+  }
+});
+
+// Restore from URL params on load
 window.onload = function() {
+  const p = new URLSearchParams(location.search);
+  if (p.has('h'))  inputs.hydration_pct.value      = p.get('h');
+  if (p.has('l'))  inputs.levain_pct.value          = p.get('l');
+  if (p.has('lh')) inputs.levain_hydration_pct.value = p.get('lh');
+  if (p.has('s'))  inputs.salt_pct.value            = p.get('s');
+  if (p.has('f'))  inputs.total_flour_g.value       = p.get('f');
+  if (p.has('rw')) inputs.reserve_water_pct.value   = p.get('rw');
+  if (p.has('a'))  setAutolyse(p.get('a') === '1');
   handleInput();
 };
