@@ -35,95 +35,29 @@
       <div id="inputs-grid">
         <p class="section-label">Input</p>
         <div class="converter">
-        <div class="unit-card">
-          <div class="unit-header">
-            <span class="unit-name">Hydration</span>
-          </div>
-          <div class="input-wrapper" data-unit="%">
-            <input
-              type="number"
-              id="hydration_pct"
-              value="75"
-              step="any"
-              autocomplete="off"
-            />
-          </div>
-        </div>
+        <unit-card label="Hydration" name="hydration_input">
+          <input type="number" id="hydration_pct" value="75" step="any" autocomplete="off" data-unit="%" />
+        </unit-card>
 
-        <div class="unit-card">
-          <div class="unit-header">
-            <span class="unit-name">Levain</span>
-          </div>
-          <div class="input-wrapper" data-unit="%">
-            <input
-              type="number"
-              id="levain_pct"
-              value="10"
-              step="any"
-              autocomplete="off"
-            />
-          </div>
-        </div>
+        <unit-card label="Levain" name="levain_input">
+          <input type="number" id="levain_pct" value="10" step="any" autocomplete="off" data-unit="%" />
+        </unit-card>
 
-        <div class="unit-card">
-          <div class="unit-header">
-            <span class="unit-name">Levain Hydration</span>
-          </div>
-          <div class="input-wrapper" data-unit="%">
-            <input
-              type="number"
-              id="levain_hydration_pct"
-              value="100"
-              step="any"
-              autocomplete="off"
-            />
-          </div>
-        </div>
+        <unit-card label="Levain Hydration" name="levain_hydration_input">
+          <input type="number" id="levain_hydration_pct" value="100" step="any" autocomplete="off" data-unit="%" />
+        </unit-card>
 
-        <div class="unit-card">
-          <div class="unit-header">
-            <span class="unit-name">Salt</span>
-          </div>
-          <div class="input-wrapper" data-unit="%">
-            <input
-              type="number"
-              id="salt_pct"
-              value="2.5"
-              step="any"
-              autocomplete="off"
-            />
-          </div>
-        </div>
+        <unit-card label="Salt" name="salt_input">
+          <input type="number" id="salt_pct" value="2.5" step="any" autocomplete="off" data-unit="%" />
+        </unit-card>
 
-        <div class="unit-card">
-          <div class="unit-header">
-            <span class="unit-name">Total Flour</span>
-          </div>
-          <div class="input-wrapper" data-unit="g">
-            <input
-              type="number"
-              id="total_flour_g"
-              value="500"
-              step="any"
-              autocomplete="off"
-            />
-          </div>
-        </div>
+        <unit-card label="Total Flour" name="total_flour_input">
+          <input type="number" id="total_flour_g" value="500" step="any" autocomplete="off" data-unit="g" />
+        </unit-card>
 
-        <div class="unit-card autolyse-input-only">
-          <div class="unit-header">
-            <span class="unit-name">Reserve Water</span>
-          </div>
-          <div class="input-wrapper" data-unit="%">
-            <input
-              type="number"
-              id="reserve_water_pct"
-              value="5"
-              step="any"
-              autocomplete="off"
-            />
-          </div>
-        </div>
+        <unit-card label="Reserve Water" name="reserve_water_input" class="autolyse-input-only">
+          <input type="number" id="reserve_water_pct" value="5" step="any" autocomplete="off" data-unit="%" />
+        </unit-card>
         </div>
       </div>
 
@@ -131,64 +65,34 @@
         <div class="phase-group">
           <p class="phase-label first-phase-label"></p>
           <div class="converter">
-            <div class="unit-card">
-              <div class="unit-header">
-                <span class="unit-name">Total Weight</span>
-              </div>
-              <div class="input-wrapper" data-unit="g">
-                <span id="weight_result_g" class="result">0</span>
-              </div>
-            </div>
+            <unit-card label="Total Weight" name="total_weight_result">
+              <span id="weight_result_g" class="result" data-unit="g">0</span>
+            </unit-card>
 
-            <div class="unit-card">
-              <div class="unit-header">
-                <span class="unit-name">Flour</span>
-              </div>
-              <div class="input-wrapper" data-unit="g">
-                <span id="flour_result_g" class="result">0</span>
-              </div>
-            </div>
+            <unit-card label="Flour" name="flour_result">
+              <span id="flour_result_g" class="result" data-unit="g">0</span>
+            </unit-card>
 
-            <div class="unit-card">
-              <div class="unit-header">
-                <span class="unit-name">Water</span>
-              </div>
-              <div class="input-wrapper" data-unit="g">
-                <span id="water_result_g" class="result">0</span>
-              </div>
-            </div>
+            <unit-card label="Water" name="water_result">
+              <span id="water_result_g" class="result" data-unit="g">0</span>
+            </unit-card>
 
-            <div class="unit-card">
-              <div class="unit-header">
-                <span class="unit-name">Levain</span>
-              </div>
-              <div class="input-wrapper" data-unit="g">
-                <span id="levain_result_g" class="result">0</span>
-              </div>
-            </div>
+            <unit-card label="Levain" name="levain_result">
+              <span id="levain_result_g" class="result" data-unit="g">0</span>
+            </unit-card>
           </div>
         </div>
 
         <div class="phase-group" id="phase-after">
           <p class="phase-label">After Autolyse</p>
           <div class="converter">
-            <div class="unit-card">
-              <div class="unit-header">
-                <span class="unit-name">Salt</span>
-              </div>
-              <div class="input-wrapper" data-unit="g">
-                <span id="salt_result_g" class="result">0</span>
-              </div>
-            </div>
+            <unit-card label="Salt" name="salt_result">
+              <span id="salt_result_g" class="result" data-unit="g">0</span>
+            </unit-card>
 
-            <div class="unit-card autolyse-only">
-              <div class="unit-header">
-                <span class="unit-name">Reserve Water</span>
-              </div>
-              <div class="input-wrapper" data-unit="g">
-                <span id="reserve_water_result_g" class="result">0</span>
-              </div>
-            </div>
+            <unit-card label="Reserve Water" name="reserve_water_result" class="autolyse-only">
+              <span id="reserve_water_result_g" class="result" data-unit="g">0</span>
+            </unit-card>
           </div>
         </div>
       </div>

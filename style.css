@@ -189,7 +189,8 @@ h1 {
   gap: 0.5rem;
 }
 
-.unit-card {
+.unit-card,
+unit-card {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -200,7 +201,8 @@ h1 {
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
-.unit-card:focus-within {
+.unit-card:focus-within,
+unit-card:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
 }
