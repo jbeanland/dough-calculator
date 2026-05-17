@@ -169,6 +169,12 @@ function buildShareUrl() {
   } else {
     p.delete('fl');
   }
+  const hasCustomName = flourNames.some(n => n.trim() !== '');
+  if (hasCustomName) {
+    p.set('fn', flourNames.join('|'));
+  } else {
+    p.delete('fn');
+  }
   return url.toString();
 }
 
@@ -218,6 +224,7 @@ function currentSettings() {
     reserve_water_pct:  cards.reserve_water_input.getInput(),
     autolyse:           autolyseCheckbox.checked,
     flours:             JSON.stringify(flourInputValues),
+    flourNames:         JSON.stringify(flourNames),
   };
 }
 
@@ -254,14 +261,16 @@ function renderSaves() {
       const s = save.settings;
       cards.hydration_input.setInput(s.hydration_pct);
       cards.levain_input.setInput(s.levain_pct);
-      levainRatioFeed.value  = s.levain_ratio_feed  ?? levainRatioFeed.value;
-      levainRatioFlour.value = s.levain_ratio_flour ?? levainRatioFlour.value;
-      levainRatioWater.value = s.levain_ratio_water ?? levainRatioWater.value;
+      cards.levain_ratio_feed.value  = s.levain_ratio_feed  ?? cards.levain_ratio_feed.value;
+      cards.levain_ratio_flour.value = s.levain_ratio_flour ?? cards.levain_ratio_flour.value;
+      cards.levain_ratio_water.value = s.levain_ratio_water ?? cards.levain_ratio_water.value;
       cards.salt_input.setInput(s.salt_pct);
       cards.total_flour_input.setInput(s.total_flour_g);
       cards.reserve_water_input.setInput(s.reserve_water_pct);
       flourInputValues = JSON.parse(s.flours || '[]');
-      if (flourInputValues.length > 0) {
+      flourNames = JSON.parse(s.flourNames || '[""]');
+      while (flourNames.length < flourInputValues.length + 1) flourNames.push('');
+      if (flourInputValues.length > 0 || flourNames.some(n => n.trim() !== '')) {
         floursToggle.setAttribute('aria-expanded', 'true');
         floursContent.hidden = false;
       } else {
@@ -282,7 +291,7 @@ saveLabelInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('save-btn').click();
 });
 
-const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_ratio_feed', 'levain_ratio_flour', 'levain_ratio_water', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse', 'flours'];
+const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_ratio_feed', 'levain_ratio_flour', 'levain_ratio_water', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse', 'flours', 'flourNames'];
 
 function settingsEqual(a, b) {
   return SETTINGS_KEYS.every(k => String(a[k]) === String(b[k]));
@@ -339,23 +348,24 @@ window.onload = function() {
   const p = new URLSearchParams(location.search);
   if (p.has('h'))  cards.hydration_input.setInput(p.get('h'));
   if (p.has('l'))  cards.levain_input.setInput(p.get('l'));
-  if (p.has('lrf')) levainRatioFeed.value  = p.get('lrf');
-  if (p.has('lrl')) levainRatioFlour.value = p.get('lrl');
-  if (p.has('lrw')) levainRatioWater.value = p.get('lrw');
+  if (p.has('lrf')) cards.levain_ratio_feed.value  = p.get('lrf');
+  if (p.has('lrl')) cards.levain_ratio_flour.value = p.get('lrl');
+  if (p.has('lrw')) cards.levain_ratio_water.value = p.get('lrw');
   if (p.has('s'))  cards.salt_input.setInput(p.get('s'));
   if (p.has('f'))  cards.total_flour_input.setInput(p.get('f'));
   if (p.has('rw')) cards.reserve_water_input.setInput(p.get('rw'));
   if (p.has('a'))  setAutolyse(p.get('a') === '1');
   if (p.has('fl')) {
     flourInputValues = p.get('fl').split(',').filter(Boolean);
-    if (flourInputValues.length > 0) {
-      floursToggle.setAttribute('aria-expanded', 'true');
-      floursContent.hidden = false;
-    }
-    else {
-      floursToggle.setAttribute('aria-expanded', 'false');
-      floursContent.hidden = true;
-    }
+  }
+  if (p.has('fn')) {
+    flourNames = p.get('fn').split('|');
+    while (flourNames.length < flourInputValues.length + 1) flourNames.push('');
+  }
+  if (p.has('fl') || p.has('fn')) {
+    const floursOpen = flourInputValues.length > 0 || flourNames.some(n => n.trim() !== '');
+    floursToggle.setAttribute('aria-expanded', String(floursOpen));
+    floursContent.hidden = !floursOpen;
   }
   handleInput();
   renderSaves();
@@ -370,6 +380,9 @@ const flourAdd = document.getElementById('flour-add');
 const flourRemove = document.getElementById('flour-remove');
 
 let flourInputValues = []; // values for Flour 2, 3, ... (Flour 1 is computed)
+let flourNames = [''];    // index 0 = Flour 1, index n = Flour n+1
+
+function defaultFlourName(n) { return 'Flour ' + n; }
 
 function flour1Value() {
   const sum = flourInputValues.reduce((acc, v) => acc + (parseFloat(v) || 0), 0);
@@ -388,24 +401,49 @@ function updateFlour1() {
   if (flour_grams) flour_grams.textContent = formatDisplay(val / 100 * totalFlour - levain_flour_g);
 }
 
+function makeFlourNameInput(index) {
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.className = 'flour-name-input';
+  nameInput.value = flourNames[index] || '';
+  nameInput.placeholder = defaultFlourName(index + 1);
+  nameInput.addEventListener('input', () => {
+    flourNames[index] = nameInput.value;
+    clearNamesBtn.disabled = !flourNames.some(n => n.trim() !== '');
+  });
+  return nameInput;
+}
+
 function renderFlours() {
   floursGrid.innerHTML = '';
 
   const totalFlour = parseFloat(cards.total_flour_input.getInput()) || 0;
   const f1 = flour1Value();
+
   const card1 = document.createElement('unit-card');
-  card1.setAttribute('label', 'Flour 1');
   card1.setAttribute('name', 'flour_1');
-  card1.innerHTML = `
-    <span class="result" id="flour-1-value" data-unit="%">${f1}</span>
-    <span class="result flour-grams" id="flour-1-grams" data-unit="g">${formatDisplay(f1 / 100 * totalFlour)}</span>
-  `;
+  const header1 = document.createElement('div');
+  header1.className = 'unit-header';
+  header1.append(makeFlourNameInput(0));
+  const pct1Span = document.createElement('span');
+  pct1Span.className = 'result';
+  pct1Span.id = 'flour-1-value';
+  pct1Span.dataset.unit = '%';
+  pct1Span.textContent = f1;
+  const grams1Span = document.createElement('span');
+  grams1Span.className = 'result flour-grams';
+  grams1Span.id = 'flour-1-grams';
+  grams1Span.dataset.unit = 'g';
+  grams1Span.textContent = formatDisplay(f1 / 100 * totalFlour);
+  card1.append(header1, pct1Span, grams1Span);
   floursGrid.append(card1);
 
   flourInputValues.forEach((val, i) => {
     const card = document.createElement('unit-card');
-    card.setAttribute('label', `Flour ${i + 2}`);
     card.setAttribute('name', `flour_${i + 2}`);
+    const header = document.createElement('div');
+    header.className = 'unit-header';
+    header.append(makeFlourNameInput(i + 1));
     const pct = parseFloat(val) || 0;
     const input = document.createElement('input');
     input.type = 'number';
@@ -423,11 +461,12 @@ function renderFlours() {
     });
     input.dataset.unit = '%';
     gramsSpan.dataset.unit = 'g';
-    card.append(input, gramsSpan);
+    card.append(header, input, gramsSpan);
     floursGrid.append(card);
   });
 
   flourRemove.disabled = flourInputValues.length === 0;
+  clearNamesBtn.disabled = !flourNames.some(n => n.trim() !== '');
   updateFlour1();
 }
 
@@ -437,14 +476,23 @@ floursToggle.addEventListener('click', () => {
   floursContent.hidden = expanded;
 });
 
+const clearNamesBtn = document.getElementById('flour-clear-names');
+
 flourAdd.addEventListener('click', () => {
   flourInputValues.push('');
+  flourNames.push('');
   renderFlours();
 });
 
 flourRemove.addEventListener('click', () => {
   if (flourInputValues.length > 0) {
     flourInputValues.pop();
+    flourNames.pop();
     renderFlours();
   }
+});
+
+clearNamesBtn.addEventListener('click', () => {
+  flourNames = flourNames.map(() => '');
+  renderFlours();
 });

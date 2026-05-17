@@ -184,6 +184,35 @@ h1 {
   cursor: not-allowed;
 }
 
+.flour-clear-names {
+  width: auto;
+  padding: 0 0.6rem;
+  font-size: 0.75rem;
+  margin-right: auto;
+}
+
+.flour-name-input {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: inherit;
+  width: 100%;
+  padding: 1px 3px;
+  transition: border-color var(--transition), background var(--transition), color var(--transition);
+}
+
+.flour-name-input:hover {
+  border-color: var(--border);
+}
+
+.flour-name-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  color: var(--text);
+}
+
 /* Unit cards */
 .converter {
   display: grid;
