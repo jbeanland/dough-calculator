@@ -44,10 +44,13 @@ const cards = {
   // Inputs
   hydration_input:        document.querySelector('unit-card[name="hydration_input"]'),
   levain_input:           document.querySelector('unit-card[name="levain_input"]'),
-  levain_hydration_input: document.querySelector('unit-card[name="levain_hydration_input"]'),
+  levain_ratio_feed:      document.getElementById('levain_ratio_feed'),
+  levain_ratio_flour:     document.getElementById('levain_ratio_flour'),
+  levain_ratio_water:     document.getElementById('levain_ratio_water'),
   salt_input:             document.querySelector('unit-card[name="salt_input"]'),
   total_flour_input:      document.querySelector('unit-card[name="total_flour_input"]'),
   reserve_water_input:    document.querySelector('unit-card[name="reserve_water_input"]'),
+  levain_leftover_input:  document.querySelector('unit-card[name="levain_leftover_input"]'),
   // Outputs
   total_weight_result:    document.querySelector('unit-card[name="total_weight_result"]'),
   flour_result:           document.querySelector('unit-card[name="flour_result"]'),
@@ -55,6 +58,9 @@ const cards = {
   levain_result:          document.querySelector('unit-card[name="levain_result"]'),
   salt_result:            document.querySelector('unit-card[name="salt_result"]'),
   reserve_water_result:   document.querySelector('unit-card[name="reserve_water_result"]'),
+  levain_feed_result:     document.querySelector('unit-card[name="levain_feed_result"]'),
+  levain_flour_result:    document.querySelector('unit-card[name="levain_flour_result"]'),
+  levain_water_result:    document.querySelector('unit-card[name="levain_water_result"]'),
 };
 
 const autolyseCheckbox = document.getElementById('autolyse');
@@ -67,20 +73,32 @@ function formatDisplay(n, digits=0) {
 function handleInput() {
   var hydration_pct = cards.hydration_input.getInput();
   var levain_pct = cards.levain_input.getInput();
-  var levain_hydration_pct = cards.levain_hydration_input.getInput();
+  var ratio_flour = parseFloat(cards.levain_ratio_flour.value);
+  var ratio_water = parseFloat(cards.levain_ratio_water.value);
+  var ratio_feed = parseFloat(cards.levain_ratio_feed.value);
   var salt_pct = cards.salt_input.getInput();
   var total_flour_g = cards.total_flour_input.getInput();
   var reserve_water_pct = autolyseCheckbox.checked ? cards.reserve_water_input.getInput() : 0;
+  var levain_leftover_g = parseFloat(cards.levain_leftover_input.getInput());
 
   if (
     isNaN(hydration_pct)
     || isNaN(levain_pct)
-    || isNaN(levain_hydration_pct)
+    || isNaN(ratio_flour)
+    || isNaN(ratio_water)
+    || isNaN(ratio_feed)
+    || ratio_flour == 0
+    || ratio_water == 0
+    || ratio_feed == 0
     || isNaN(salt_pct)
     || isNaN(total_flour_g)
     || isNaN(reserve_water_pct)
-  ) return
+    || isNaN(levain_leftover_g)
+  ) {
+    return
+  }
 
+  const levain_hydration_pct = (ratio_water / ratio_flour) * 100;
   const total_water_g = hydration_pct * total_flour_g / 100;
   const levain_flour_g = levain_pct * total_flour_g / 100;
   const levain_water_g = levain_flour_g * levain_hydration_pct / 100;
@@ -90,6 +108,11 @@ function handleInput() {
   const new_water_g = total_water_g - levain_water_g - reserve_water_g;
   const new_salt_g = salt_pct * total_flour_g / 100;
   const total_weight_g = total_water_g + total_flour_g + new_salt_g;
+  const total_required_levain_g = total_levain_g + levain_leftover_g;
+  const levain_ratio_sum = ratio_flour + ratio_water + ratio_feed;
+  const levain_feed_starter_g = total_required_levain_g * (ratio_feed / levain_ratio_sum);
+  const levain_feed_flour_g = total_required_levain_g * (ratio_flour / levain_ratio_sum);
+  const levain_feed_water_g = total_required_levain_g * (ratio_water / levain_ratio_sum);
 
   cards.total_weight_result.setResult(formatDisplay(total_weight_g));
   cards.water_result.setResult(formatDisplay(new_water_g - reserve_water_g));
@@ -97,6 +120,9 @@ function handleInput() {
   cards.levain_result.setResult(formatDisplay(total_levain_g));
   cards.salt_result.setResult(formatDisplay(new_salt_g, 2));
   cards.reserve_water_result.setResult(formatDisplay(reserve_water_g));
+  cards.levain_feed_result.setResult(formatDisplay(levain_feed_starter_g));
+  cards.levain_flour_result.setResult(formatDisplay(levain_feed_flour_g));
+  cards.levain_water_result.setResult(formatDisplay(levain_feed_water_g));
 
   renderFlours();
 }
@@ -110,7 +136,8 @@ function setAutolyse(active) {
 
 // Add input listeners
 for (const card of Object.values(cards)) {
-  card.querySelector('input')?.addEventListener('input', () => handleInput());
+  const input = card instanceof HTMLInputElement ? card : card.querySelector('input');
+  input?.addEventListener('input', () => handleInput());
 }
 
 autolyseCheckbox.addEventListener('change', () => {
@@ -130,7 +157,9 @@ function buildShareUrl() {
   const p = url.searchParams;
   p.set('h',  cards.hydration_input.getInput());
   p.set('l',  cards.levain_input.getInput());
-  p.set('lh', cards.levain_hydration_input.getInput());
+  p.set('lrf', cards.levain_ratio_feed.value);
+  p.set('lrl', cards.levain_ratio_flour.value);
+  p.set('lrw', cards.levain_ratio_water.value);
   p.set('s',  cards.salt_input.getInput());
   p.set('f',  cards.total_flour_input.getInput());
   p.set('rw', cards.reserve_water_input.getInput());
@@ -181,7 +210,9 @@ function currentSettings() {
   return {
     hydration_pct:      cards.hydration_input.getInput(),
     levain_pct:         cards.levain_input.getInput(),
-    levain_hydration_pct: cards.levain_hydration_input.getInput(),
+    levain_ratio_feed:  cards.levain_ratio_feed.value,
+    levain_ratio_flour: cards.levain_ratio_flour.value,
+    levain_ratio_water: cards.levain_ratio_water.value,
     salt_pct:           cards.salt_input.getInput(),
     total_flour_g:      cards.total_flour_input.getInput(),
     reserve_water_pct:  cards.reserve_water_input.getInput(),
@@ -223,7 +254,9 @@ function renderSaves() {
       const s = save.settings;
       cards.hydration_input.setInput(s.hydration_pct);
       cards.levain_input.setInput(s.levain_pct);
-      cards.levain_hydration_input.setInput(s.levain_hydration_pct);
+      levainRatioFeed.value  = s.levain_ratio_feed  ?? levainRatioFeed.value;
+      levainRatioFlour.value = s.levain_ratio_flour ?? levainRatioFlour.value;
+      levainRatioWater.value = s.levain_ratio_water ?? levainRatioWater.value;
       cards.salt_input.setInput(s.salt_pct);
       cards.total_flour_input.setInput(s.total_flour_g);
       cards.reserve_water_input.setInput(s.reserve_water_pct);
@@ -249,7 +282,7 @@ saveLabelInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('save-btn').click();
 });
 
-const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_hydration_pct', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse', 'flours'];
+const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_ratio_feed', 'levain_ratio_flour', 'levain_ratio_water', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse', 'flours'];
 
 function settingsEqual(a, b) {
   return SETTINGS_KEYS.every(k => String(a[k]) === String(b[k]));
@@ -306,7 +339,9 @@ window.onload = function() {
   const p = new URLSearchParams(location.search);
   if (p.has('h'))  cards.hydration_input.setInput(p.get('h'));
   if (p.has('l'))  cards.levain_input.setInput(p.get('l'));
-  if (p.has('lh')) cards.levain_hydration_input.setInput(p.get('lh'));
+  if (p.has('lrf')) levainRatioFeed.value  = p.get('lrf');
+  if (p.has('lrl')) levainRatioFlour.value = p.get('lrl');
+  if (p.has('lrw')) levainRatioWater.value = p.get('lrw');
   if (p.has('s'))  cards.salt_input.setInput(p.get('s'));
   if (p.has('f'))  cards.total_flour_input.setInput(p.get('f'));
   if (p.has('rw')) cards.reserve_water_input.setInput(p.get('rw'));

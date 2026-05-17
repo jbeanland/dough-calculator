@@ -102,7 +102,8 @@ h1 {
 /* Section panels */
 #inputs-grid,
 #results,
-#flours-section {
+#flours-section,
+#levain-feeding-section {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -140,7 +141,8 @@ h1 {
   transform: rotate(180deg);
 }
 
-#flours-content {
+#flours-content,
+#levain-feeding-content {
   padding: 0 0.875rem 0.875rem;
 }
 
@@ -244,6 +246,32 @@ unit-card:focus-within {
 .input-wrapper[data-unit] input[type="number"],
 .input-wrapper[data-unit] .result {
   padding-right: 1.8rem;
+}
+
+.ratio-card .ratio-inputs {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.ratio-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ratio-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.ratio-sep {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
 }
 
 input[type="number"] {
