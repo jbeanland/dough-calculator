@@ -476,6 +476,15 @@ floursToggle.addEventListener('click', () => {
   floursContent.hidden = expanded;
 });
 
+const flourInfoTip = document.querySelector('.flour-info-tip');
+flourInfoTip.addEventListener('click', (e) => {
+  e.stopPropagation();
+  flourInfoTip.classList.toggle('is-open');
+});
+document.addEventListener('click', () => {
+  flourInfoTip.classList.remove('is-open');
+});
+
 const clearNamesBtn = document.getElementById('flour-clear-names');
 
 flourAdd.addEventListener('click', () => {
