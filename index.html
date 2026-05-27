@@ -83,6 +83,15 @@
         <unit-card label="Reserve Water" name="reserve_water_input" class="autolyse-input-only">
           <input type="number" id="reserve_water_pct" value="5" step="any" autocomplete="off" data-unit="%" />
         </unit-card>
+        <div id="flours-grid" style="display:contents"></div>
+        </div>
+        <div class="flours-actions">
+          <button class="flour-info-tip" type="button" aria-label="We assume that your levain is made of the first flour here. The weights shown are excluding the flour already in the levain.">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          </button>
+          <button class="flour-btn flour-clear-names" id="flour-clear-names" disabled>Reset</button>
+          <button class="flour-btn" id="flour-remove" aria-label="Remove flour">−</button>
+          <button class="flour-btn" id="flour-add" aria-label="Add flour">+</button>
         </div>
       </div>
 
@@ -112,13 +121,9 @@
       <div id="results">
         <div class="phase-group">
           <p class="phase-label first-phase-label"></p>
-          <div class="converter">
+          <div class="converter" id="results-converter">
             <unit-card label="Total Weight" name="total_weight_result">
               <span id="weight_result_g" class="result" data-unit="g">0</span>
-            </unit-card>
-
-            <unit-card label="New Flour" name="flour_result">
-              <span id="flour_result_g" class="result" data-unit="g">0</span>
             </unit-card>
 
             <unit-card label="New Water" name="water_result">
@@ -128,13 +133,16 @@
             <unit-card label="Levain" name="levain_result">
               <span id="levain_result_g" class="result" data-unit="g">0</span>
             </unit-card>
+            <unit-card label="Salt" name="salt_result_main" class="non-autolyse-only">
+              <span class="result" data-unit="g">0</span>
+            </unit-card>
           </div>
         </div>
 
         <div class="phase-group" id="phase-after">
           <p class="phase-label">After Autolyse</p>
           <div class="converter">
-            <unit-card label="Salt" name="salt_result">
+            <unit-card label="Salt" name="salt_result" class="autolyse-only">
               <span id="salt_result_g" class="result" data-unit="g">0</span>
             </unit-card>
 
@@ -144,27 +152,6 @@
           </div>
         </div>
       </div>
-
-      <div id="flours-section">
-        <div class="flours-header-row">
-          <button class="flours-header" id="flours-toggle" aria-expanded="false">
-            <span class="section-label" style="margin:0">Flours</span>
-            <svg class="flours-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-          <button class="flour-info-tip" type="button" aria-label="We assume that your levain is made of the first flour here. The weights shown are excluding the flour already in the levain.">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          </button>
-        </div>
-        <div id="flours-content" hidden>
-          <div class="converter" id="flours-grid"></div>
-          <div class="flours-actions">
-            <button class="flour-btn flour-clear-names" id="flour-clear-names" disabled>Clear Names</button>
-            <button class="flour-btn" id="flour-remove" aria-label="Remove flour">−</button>
-            <button class="flour-btn" id="flour-add" aria-label="Add flour">+</button>
-          </div>
-        </div>
-      </div>
-
 
       <section id="saves-section" hidden>
         <p class="saves-heading">Saved</p>

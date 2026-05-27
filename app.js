@@ -53,10 +53,10 @@ const cards = {
   levain_leftover_input:  document.querySelector('unit-card[name="levain_leftover_input"]'),
   // Outputs
   total_weight_result:    document.querySelector('unit-card[name="total_weight_result"]'),
-  flour_result:           document.querySelector('unit-card[name="flour_result"]'),
   water_result:           document.querySelector('unit-card[name="water_result"]'),
   levain_result:          document.querySelector('unit-card[name="levain_result"]'),
   salt_result:            document.querySelector('unit-card[name="salt_result"]'),
+  salt_result_main:       document.querySelector('unit-card[name="salt_result_main"]'),
   reserve_water_result:   document.querySelector('unit-card[name="reserve_water_result"]'),
   levain_feed_result:     document.querySelector('unit-card[name="levain_feed_result"]'),
   levain_flour_result:    document.querySelector('unit-card[name="levain_flour_result"]'),
@@ -116,9 +116,9 @@ function handleInput() {
 
   cards.total_weight_result.setResult(formatDisplay(total_weight_g));
   cards.water_result.setResult(formatDisplay(new_water_g - reserve_water_g));
-  cards.flour_result.setResult(formatDisplay(new_flour_g));
   cards.levain_result.setResult(formatDisplay(total_levain_g));
   cards.salt_result.setResult(formatDisplay(new_salt_g, 2));
+  cards.salt_result_main.setResult(formatDisplay(new_salt_g, 2));
   cards.reserve_water_result.setResult(formatDisplay(reserve_water_g));
   cards.levain_feed_result.setResult(formatDisplay(levain_feed_starter_g));
   cards.levain_flour_result.setResult(formatDisplay(levain_feed_flour_g));
@@ -270,13 +270,6 @@ function renderSaves() {
       flourInputValues = JSON.parse(s.flours || '[]');
       flourNames = JSON.parse(s.flourNames || '[""]');
       while (flourNames.length < flourInputValues.length + 1) flourNames.push('');
-      if (flourInputValues.length > 0 || flourNames.some(n => n.trim() !== '')) {
-        floursToggle.setAttribute('aria-expanded', 'true');
-        floursContent.hidden = false;
-      } else {
-        floursToggle.setAttribute('aria-expanded', 'false');
-        floursContent.hidden = true;
-      }
       setAutolyse(s.autolyse);
       handleInput();
     });
@@ -362,20 +355,14 @@ window.onload = function() {
     flourNames = p.get('fn').split('|');
     while (flourNames.length < flourInputValues.length + 1) flourNames.push('');
   }
-  if (p.has('fl') || p.has('fn')) {
-    const floursOpen = flourInputValues.length > 0 || flourNames.some(n => n.trim() !== '');
-    floursToggle.setAttribute('aria-expanded', String(floursOpen));
-    floursContent.hidden = !floursOpen;
-  }
   handleInput();
   renderSaves();
 };
 
 //////////////////////////////////////////////////////
 // Different Flours
-const floursToggle = document.getElementById('flours-toggle');
-const floursContent = document.getElementById('flours-content');
 const floursGrid = document.getElementById('flours-grid');
+const resultsConverter = document.getElementById('results-converter');
 const flourAdd = document.getElementById('flour-add');
 const flourRemove = document.getElementById('flour-remove');
 
@@ -409,17 +396,40 @@ function makeFlourNameInput(index) {
   nameInput.placeholder = defaultFlourName(index + 1);
   nameInput.addEventListener('input', () => {
     flourNames[index] = nameInput.value;
-    clearNamesBtn.disabled = !flourNames.some(n => n.trim() !== '');
+    clearNamesBtn.disabled = flourInputValues.length === 0 && !flourNames.some(n => n.trim() !== '');
+    const labelEl = document.getElementById(`flour-${index + 1}-label`);
+    if (labelEl) labelEl.textContent = nameInput.value || defaultFlourName(index + 1);
   });
   return nameInput;
 }
 
+function makeFlourResultCard(n, name, gramsId) {
+  const card = document.createElement('unit-card');
+  card.classList.add('flour-result-card');
+  const header = document.createElement('div');
+  header.className = 'unit-header';
+  const label = document.createElement('span');
+  label.className = 'unit-name';
+  label.id = `flour-${n}-label`;
+  label.textContent = name || defaultFlourName(n);
+  header.append(label);
+  const gramsSpan = document.createElement('span');
+  gramsSpan.className = 'result';
+  gramsSpan.id = gramsId;
+  gramsSpan.dataset.unit = 'g';
+  gramsSpan.textContent = '0';
+  card.append(header, gramsSpan);
+  return card;
+}
+
 function renderFlours() {
   floursGrid.innerHTML = '';
+  resultsConverter.querySelectorAll('.flour-result-card').forEach(el => el.remove());
 
   const totalFlour = parseFloat(cards.total_flour_input.getInput()) || 0;
   const f1 = flour1Value();
 
+  // Flour 1 input card — computed %, no grams
   const card1 = document.createElement('unit-card');
   card1.setAttribute('name', 'flour_1');
   const header1 = document.createElement('div');
@@ -430,51 +440,49 @@ function renderFlours() {
   pct1Span.id = 'flour-1-value';
   pct1Span.dataset.unit = '%';
   pct1Span.textContent = f1;
-  const grams1Span = document.createElement('span');
-  grams1Span.className = 'result flour-grams';
-  grams1Span.id = 'flour-1-grams';
-  grams1Span.dataset.unit = 'g';
-  grams1Span.textContent = formatDisplay(f1 / 100 * totalFlour);
-  card1.append(header1, pct1Span, grams1Span);
+  card1.append(header1, pct1Span);
   floursGrid.append(card1);
 
+  // Flour 1 result card — grams only (inserted before the non-autolyse salt card)
+  const saltMainCard = resultsConverter.querySelector('[name="salt_result_main"]');
+  resultsConverter.insertBefore(makeFlourResultCard(1, flourNames[0], 'flour-1-grams'), saltMainCard);
+
   flourInputValues.forEach((val, i) => {
+    const n = i + 2;
+
+    // Input card — % input, no grams
     const card = document.createElement('unit-card');
-    card.setAttribute('name', `flour_${i + 2}`);
+    card.setAttribute('name', `flour_${n}`);
     const header = document.createElement('div');
     header.className = 'unit-header';
     header.append(makeFlourNameInput(i + 1));
-    const pct = parseFloat(val) || 0;
     const input = document.createElement('input');
     input.type = 'number';
     input.placeholder = '0';
     input.step = 'any';
     input.autocomplete = 'off';
     input.value = val;
-    const gramsSpan = document.createElement('span');
-    gramsSpan.className = 'result flour-grams';
-    gramsSpan.textContent = formatDisplay(pct / 100 * totalFlour);
+    input.dataset.unit = '%';
     input.addEventListener('input', () => {
       flourInputValues[i] = input.value;
-      gramsSpan.textContent = formatDisplay((parseFloat(input.value) || 0) / 100 * totalFlour);
+      const gramsSpan = document.getElementById(`flour-${n}-grams`);
+      if (gramsSpan) gramsSpan.textContent = formatDisplay((parseFloat(input.value) || 0) / 100 * totalFlour);
       updateFlour1();
     });
-    input.dataset.unit = '%';
-    gramsSpan.dataset.unit = 'g';
-    card.append(header, input, gramsSpan);
+    card.append(header, input);
     floursGrid.append(card);
+
+    // Result card — grams only
+    const resultCard = makeFlourResultCard(n, flourNames[i + 1], `flour-${n}-grams`);
+    const pct = parseFloat(val) || 0;
+    resultCard.querySelector('span.result').textContent = formatDisplay(pct / 100 * totalFlour);
+    resultsConverter.insertBefore(resultCard, saltMainCard);
   });
 
   flourRemove.disabled = flourInputValues.length === 0;
   clearNamesBtn.disabled = !flourNames.some(n => n.trim() !== '');
   updateFlour1();
 }
-
-floursToggle.addEventListener('click', () => {
-  const expanded = floursToggle.getAttribute('aria-expanded') === 'true';
-  floursToggle.setAttribute('aria-expanded', String(!expanded));
-  floursContent.hidden = expanded;
-});
 
 const flourInfoTip = document.querySelector('.flour-info-tip');
 flourInfoTip.addEventListener('click', (e) => {
@@ -502,6 +510,7 @@ flourRemove.addEventListener('click', () => {
 });
 
 clearNamesBtn.addEventListener('click', () => {
-  flourNames = flourNames.map(() => '');
+  flourInputValues = [];
+  flourNames = [''];
   renderFlours();
 });

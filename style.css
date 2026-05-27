@@ -102,7 +102,6 @@ h1 {
 /* Section panels */
 #inputs-grid,
 #results,
-#flours-section,
 #levain-feeding-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -114,29 +113,6 @@ h1 {
   padding: 0.875rem;
 }
 
-.flours-header {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.875rem;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  text-align: left;
-  transition: color var(--transition);
-}
-
-.flours-header:hover {
-  color: var(--text);
-}
-
-.flours-header-row {
-  display: flex;
-  align-items: center;
-}
-
 .flour-info-tip {
   position: relative;
   display: flex;
@@ -144,7 +120,7 @@ h1 {
   background: transparent;
   border: none;
   color: var(--text-muted);
-  padding: 0.875rem 0.875rem 0.875rem 0;
+  padding: 0;
   cursor: pointer;
   opacity: 0.5;
   flex-shrink: 0;
@@ -160,7 +136,7 @@ h1 {
   content: "We assume that your levain is made of the first flour here.";
   position: absolute;
   bottom: calc(100% + 6px);
-  right: 0;
+  left: 0;
   background: var(--surface-2);
   border: 1px solid var(--border);
   color: var(--text);
@@ -187,30 +163,15 @@ h1 {
   opacity: 1;
 }
 
-.flours-chevron {
-  flex-shrink: 0;
-  transition: transform var(--transition);
-}
-
-.flours-header[aria-expanded="true"] .flours-chevron {
-  transform: rotate(180deg);
-}
-
-#flours-content,
 #levain-feeding-content {
   padding: 0 0.875rem 0.875rem;
 }
 
-#flours-content:not([hidden]) {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
 .flours-actions {
+  padding-top: 0.5rem;
   display: flex;
+  align-items: center;
   gap: 0.5rem;
-  justify-content: flex-end;
 }
 
 .flour-btn {
@@ -607,6 +568,10 @@ input[type="number"].invalid {
 }
 
 .autolyse-only {
+  display: none;
+}
+
+#results.autolyse .non-autolyse-only {
   display: none;
 }
 
