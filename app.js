@@ -125,6 +125,7 @@ function handleInput() {
   cards.levain_water_result.setResult(formatDisplay(levain_feed_water_g));
 
   renderFlours();
+  localStorage.setItem(LAST_KEY, JSON.stringify(currentSettings()));
 }
 
 function setAutolyse(active) {
@@ -202,6 +203,7 @@ shareBtn.addEventListener('click', () => {
 //////////////////////////////////////////////////////
 // Saves
 const STORAGE_KEY = 'dough_saves';
+const LAST_KEY = 'dough_last';
 
 function getSaves() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
@@ -258,19 +260,7 @@ function renderSaves() {
     });
 
     row.addEventListener('click', () => {
-      const s = save.settings;
-      cards.hydration_input.setInput(s.hydration_pct);
-      cards.levain_input.setInput(s.levain_pct);
-      cards.levain_ratio_feed.value  = s.levain_ratio_feed  ?? cards.levain_ratio_feed.value;
-      cards.levain_ratio_flour.value = s.levain_ratio_flour ?? cards.levain_ratio_flour.value;
-      cards.levain_ratio_water.value = s.levain_ratio_water ?? cards.levain_ratio_water.value;
-      cards.salt_input.setInput(s.salt_pct);
-      cards.total_flour_input.setInput(s.total_flour_g);
-      cards.reserve_water_input.setInput(s.reserve_water_pct);
-      flourInputValues = JSON.parse(s.flours || '[]');
-      flourNames = JSON.parse(s.flourNames || '[""]');
-      while (flourNames.length < flourInputValues.length + 1) flourNames.push('');
-      setAutolyse(s.autolyse);
+      applySettings(save.settings);
       handleInput();
     });
 
@@ -283,6 +273,21 @@ const saveLabelInput = document.getElementById('save-label-input');
 saveLabelInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('save-btn').click();
 });
+
+function applySettings(s) {
+  cards.hydration_input.setInput(s.hydration_pct);
+  cards.levain_input.setInput(s.levain_pct);
+  cards.levain_ratio_feed.value  = s.levain_ratio_feed  ?? cards.levain_ratio_feed.value;
+  cards.levain_ratio_flour.value = s.levain_ratio_flour ?? cards.levain_ratio_flour.value;
+  cards.levain_ratio_water.value = s.levain_ratio_water ?? cards.levain_ratio_water.value;
+  cards.salt_input.setInput(s.salt_pct);
+  cards.total_flour_input.setInput(s.total_flour_g);
+  cards.reserve_water_input.setInput(s.reserve_water_pct);
+  flourInputValues = JSON.parse(s.flours || '[]');
+  flourNames = JSON.parse(s.flourNames || '[""]');
+  while (flourNames.length < flourInputValues.length + 1) flourNames.push('');
+  setAutolyse(s.autolyse);
+}
 
 const SETTINGS_KEYS = ['hydration_pct', 'levain_pct', 'levain_ratio_feed', 'levain_ratio_flour', 'levain_ratio_water', 'salt_pct', 'total_flour_g', 'reserve_water_pct', 'autolyse', 'flours', 'flourNames'];
 
@@ -339,6 +344,13 @@ window.onload = function() {
   setTheme(localStorage.getItem(THEME_KEY) || 'dark');
 
   const p = new URLSearchParams(location.search);
+  const hasUrlParams = ['h','l','lrf','lrl','lrw','s','f','rw','a','fl','fn'].some(k => p.has(k));
+  if (!hasUrlParams) {
+    try {
+      const last = JSON.parse(localStorage.getItem(LAST_KEY));
+      if (last) applySettings(last);
+    } catch {}
+  }
   if (p.has('h'))  cards.hydration_input.setInput(p.get('h'));
   if (p.has('l'))  cards.levain_input.setInput(p.get('l'));
   if (p.has('lrf')) cards.levain_ratio_feed.value  = p.get('lrf');
