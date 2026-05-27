@@ -249,6 +249,21 @@ function renderSaves() {
     time.className = 'save-time';
     time.textContent = new Date(save.id).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
+    const overwrite = document.createElement('button');
+    overwrite.className = 'save-overwrite';
+    overwrite.textContent = '↺';
+    overwrite.setAttribute('aria-label', 'Overwrite save with current settings');
+    overwrite.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const saves = getSaves();
+      const idx = saves.findIndex(s => s.id === save.id);
+      if (idx !== -1) {
+        saves[idx] = { id: Date.now(), label: save.label, settings: currentSettings() };
+        putSaves(saves);
+        renderSaves();
+      }
+    });
+
     const del = document.createElement('button');
     del.className = 'save-delete';
     del.textContent = '×';
@@ -264,7 +279,7 @@ function renderSaves() {
       handleInput();
     });
 
-    row.append(label, time, del);
+    row.append(label, time, overwrite, del);
     list.append(row);
   }
 }

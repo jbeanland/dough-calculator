@@ -467,6 +467,7 @@ input[type="number"].invalid {
   white-space: nowrap;
 }
 
+.save-overwrite,
 .save-delete {
   background: transparent;
   border: none;
@@ -476,6 +477,10 @@ input[type="number"].invalid {
   padding: 0 0.25rem;
   cursor: pointer;
   transition: color var(--transition);
+}
+
+.save-overwrite:hover {
+  color: var(--accent);
 }
 
 .save-delete:hover {
